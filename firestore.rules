@@ -6,12 +6,12 @@ service cloud.firestore {
       allow read: if true;
       // Replace YOUR_ADMIN_UID with the exact UID from Firebase Authentication.
       allow create, update, delete: if request.auth != null
-        && request.auth.uid == 'WRzo5liGM3Q8rLrU79CFGNiZj5s1';
+        && request.auth.uid == 'guWhzpVVyWSANtvZvVDn5r7Rr0C2';
     }
     match /memories/{memoryId} {
       allow read: if true;
       allow create, update, delete: if request.auth != null
-        && request.auth.uid == 'WRzo5liGM3Q8rLrU79CFGNiZj5s1';
+        && request.auth.uid == 'guWhzpVVyWSANtvZvVDn5r7Rr0C2';
     }
   }
 }
