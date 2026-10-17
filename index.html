@@ -63,7 +63,7 @@ function load(key,fallback){try{let x=JSON.parse(localStorage.getItem(key));retu
 let members=load('yearbook_members_v1',initial), memories=load('yearbook_memories_v1',initialMemories), currentMemory=null, editMemberId=null, editMemoryId=null, loggedIn=false, liked=new Set(JSON.parse(localStorage.getItem('yearbook_liked')||'[]'));
 const roleName=r=>({leader:'GVCN',subject:'Giáo viên',student:'Học sinh / Sinh viên'}[r]||r);
 // Firebase: replace these values with Firebase Console > Project settings > Your apps > SDK setup.
-const firebaseConfig={apiKey:'AIzaSyAq2ibWJurWdRXT8qZ9cr-_yWVfvCXkBUo',authDomain:'a6-yearbook.firebaseapp.com',projectId:'a6-yearbook',appId:'1:76062034070:web:40741941bba641b0b59ab7'};
+const firebaseConfig={apiKey:'AIzaSyAq2ibWJurWdRXT8qZ9cr-_yWVfvCXkBUo',authDomain:'12a6.sweep.id.vn',projectId:'a6-yearbook',appId:'1:76062034070:web:40741941bba641b0b59ab7'};
 const ADMIN_UID='WRzo5liGM3Q8rLrU79CFGNiZj5s1';
 let auth=null, db=null, firebaseReady=false, cloudBusy=false, cloudQueue=Promise.resolve(), unsubscribeMembers=null, unsubscribeMemories=null;
 function setCloudStatus(message){const el=$('#cloudStatus');if(el)el.textContent=message;}
