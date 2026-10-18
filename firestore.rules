@@ -1,17 +1,28 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Public visitors can read the class yearbook.
+    // Fixed bootstrap admin plus administrators explicitly approved in adminUsers.
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.uid == '9Dk0KYkx9NRtcW6pStFwdoLbOPr2' ||
+        (exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.enabled == true)
+      );
+    }
+
+    // Public visitors can read the yearbook; only approved admins can modify it.
     match /members/{memberId} {
       allow read: if true;
-      // Replace YOUR_ADMIN_UID with the exact UID from Firebase Authentication.
-      allow create, update, delete: if request.auth != null
-        && request.auth.uid == '9Dk0KYkx9NRtcW6pStFwdoLbOPr2';
+      allow create, update, delete: if isAdmin();
     }
     match /memories/{memoryId} {
       allow read: if true;
-      allow create, update, delete: if request.auth != null
-        && request.auth.uid == '9Dk0KYkx9NRtcW6pStFwdoLbOPr2';
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Only an already-authorized admin can manage the administrator allowlist.
+    match /adminUsers/{userId} {
+      allow read, create, update, delete: if isAdmin();
     }
   }
 }
