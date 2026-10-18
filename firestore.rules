@@ -1,7 +1,6 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Fixed bootstrap admin plus administrators explicitly approved in adminUsers.
     function isAdmin() {
       return request.auth != null && (
         request.auth.uid == 'YNS2wHqzFAPQS8tiFVDDpVLRlAM2' ||
@@ -20,9 +19,14 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
-    // Only an already-authorized admin can manage the administrator allowlist.
+    // Let a signed-in user read their own role document so authorization checks
+    // do not depend on recursively evaluating the adminUsers read rule.
+    // Only an already-authorized admin can list or manage administrator records.
     match /adminUsers/{userId} {
-      allow read, create, update, delete: if isAdmin();
+      allow get: if request.auth != null &&
+        (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
     }
   }
 }
