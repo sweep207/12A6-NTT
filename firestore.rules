@@ -1,32 +1,36 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isRootAdmin() {
+      return request.auth != null &&
+        request.auth.uid == 'YNS2wHqzFAPQS8tiFVDDpVLRlAM2';
+    }
+
     function isAdmin() {
       return request.auth != null && (
-        request.auth.uid == 'YNS2wHqzFAPQS8tiFVDDpVLRlAM2' ||
+        isRootAdmin() ||
         (exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid)) &&
          get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.enabled == true)
       );
     }
 
-    // Public visitors can read the yearbook; only approved admins can modify it.
     match /members/{memberId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
     }
+
     match /memories/{memoryId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
     }
 
-    // Let a signed-in user read their own role document so authorization checks
-    // do not depend on recursively evaluating the adminUsers read rule.
-    // Only an already-authorized admin can list or manage administrator records.
     match /adminUsers/{userId} {
+      // An authenticated user may read their own role document to sign in.
       allow get: if request.auth != null &&
         (request.auth.uid == userId || isAdmin());
-      allow list: if isAdmin();
-      allow create, update, delete: if isAdmin();
+      // Only the fixed root UID can list, grant, edit, or revoke admin roles.
+      allow list: if isRootAdmin();
+      allow create, update, delete: if isRootAdmin();
     }
   }
 }
