@@ -1,25 +1,34 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isAdmin() {
+    function isRootAdmin() {
       return request.auth != null &&
         request.auth.uid == 'YNS2wHqzFAPQS8tiFVDDpVLRlAM2';
     }
 
-    // Khách truy cập được xem danh sách thành viên.
-    // Chỉ quản trị viên mới được thêm, sửa hoặc xóa.
+    function isAdmin() {
+      return request.auth != null && (
+        isRootAdmin() ||
+        (exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.enabled == true)
+      );
+    }
+
     match /members/{memberId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
     }
 
-    // Khách truy cập được xem kỷ niệm.
-    // Chỉ quản trị viên mới được thêm, sửa hoặc xóa.
     match /memories/{memoryId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
     }
 
-    // Mọi collection khác mặc định bị từ chối nếu không có rule cho phép.
+    match /adminUsers/{userId} {
+      allow get: if request.auth != null &&
+        (request.auth.uid == userId || isAdmin());
+      allow list: if isRootAdmin();
+      allow create, update, delete: if isRootAdmin();
+    }
   }
 }
