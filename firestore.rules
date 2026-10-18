@@ -24,6 +24,11 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // Private photo collection: never readable by public visitors.
+    match /privatePhotos/{photoId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
     match /adminUsers/{userId} {
       // An authenticated user may read their own role document to sign in.
       allow get: if request.auth != null &&
