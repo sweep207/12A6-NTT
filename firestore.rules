@@ -4,7 +4,7 @@ service cloud.firestore {
     // Fixed bootstrap admin plus administrators explicitly approved in adminUsers.
     function isAdmin() {
       return request.auth != null && (
-        request.auth.uid == '9Dk0KYkx9NRtcW6pStFwdoLbOPr2' ||
+        request.auth.uid == 'YNS2wHqzFAPQS8tiFVDDpVLRlAM2' ||
         (exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid)) &&
          get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.enabled == true)
       );
